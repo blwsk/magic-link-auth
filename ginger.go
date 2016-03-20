@@ -31,8 +31,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostsIndexHandler(w http.ResponseWriter, r *http.Request) {
-  res1 := Post{"Tour de France 2015", randId(100000)}
-  res2 := Post{"Paris Roubaix 2015", randId(100000)}
+  res1 := Post{"Tour de France 2016", randId(100000)}
+  res2 := Post{"Paris Roubaix 2016", randId(100000)}
 
   m := Posts{
     []Post{
@@ -54,14 +54,36 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintln(w, "id:", postId)
 }
 
+type MyServer struct {
+  r *mux.Router
+}
+
+// http://stackoverflow.com/a/24818638
+func (s *MyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+  if origin := req.Header.Get("Origin"); origin != "" {
+      rw.Header().Set("Access-Control-Allow-Origin", origin)
+      rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+      rw.Header().Set("Access-Control-Allow-Headers",
+          "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+  }
+
+  // Stop here if its Preflighted OPTIONS request
+  if req.Method == "OPTIONS" {
+      return
+  }
+
+  // Lets Gorilla work
+  s.r.ServeHTTP(rw, req)
+}
+
 func main() {
   router := mux.NewRouter().StrictSlash(true)
-
-  router.Headers("Access-Control-Allow-Origin", "*")
 
   router.HandleFunc("/", IndexHandler)
   router.HandleFunc("/posts", PostsIndexHandler)
   router.HandleFunc("/posts/{postId}", PostHandler)
 
-  log.Fatal(http.ListenAndServe(":8080", router))
+  http.Handle("/", &MyServer{router})
+
+  log.Fatal(http.ListenAndServe(":8080", nil))
 }
