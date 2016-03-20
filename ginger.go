@@ -49,12 +49,15 @@ func PostsIndexHandler(w http.ResponseWriter, r *http.Request) {
 func PostHandler(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
   postId := vars["postId"]
+
   fmt.Fprintln(w, "Post")
   fmt.Fprintln(w, "id:", postId)
 }
 
 func main() {
   router := mux.NewRouter().StrictSlash(true)
+
+  router.Headers("Access-Control-Allow-Origin", "*")
 
   router.HandleFunc("/", IndexHandler)
   router.HandleFunc("/posts", PostsIndexHandler)
