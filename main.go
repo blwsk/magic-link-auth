@@ -40,13 +40,13 @@ func buildRouter() *mux.Router {
 }
 
 func main() {
-  db, err := db.ConnectToDb()
+  // db, err := db.ConnectToDb()
 
-  defer db.Close()
+  // defer db.Close()
 
-  if err != nil {
-    log.Fatal(err);
-  }
+  // if err != nil {
+  //   log.Fatal(err);
+  // }
 
   router := buildRouter()
 
