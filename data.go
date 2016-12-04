@@ -1,4 +1,4 @@
-package data
+package main
 
 type Post struct {
   Title   string  `json:"title"`

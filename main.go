@@ -3,19 +3,15 @@ package main
 import (
   "log"
   "net/http"
-
   "github.com/gorilla/mux"
-
-  "github.com/blwsk/ginger/handlers"
+  // "github.com/blwsk/ginger/db"
 )
 
 type Server struct {
-  router  *mux.Router
+  router    *mux.Router
 }
 
 func (server *Server) ServeHTTP(resWriter http.ResponseWriter, req *http.Request) {
-  // http://stackoverflow.com/a/248186381
-
   origin := req.Header.Get("Origin")
 
   if origin != "" {
@@ -26,21 +22,33 @@ func (server *Server) ServeHTTP(resWriter http.ResponseWriter, req *http.Request
       "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
   }
 
-  // Stop here if its Preflighted OPTIONS request
   if req.Method == "OPTIONS" {
     return
   }
 
-  // Lets Gorilla work
   server.router.ServeHTTP(resWriter, req)
 }
 
-func main() {
+func buildRouter() *mux.Router {
   router := mux.NewRouter().StrictSlash(true)
 
-  router.HandleFunc("/", handlers.IndexHandler)
-  router.HandleFunc("/posts", handlers.PostsIndexHandler)
-  router.HandleFunc("/posts/{postId}", handlers.PostHandler)
+  router.HandleFunc("/", IndexHandler).Methods("GET")
+  router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
+  router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
+
+  return router
+}
+
+func main() {
+  db, err := db.ConnectToDb()
+
+  defer db.Close()
+
+  if err != nil {
+    log.Fatal(err);
+  }
+
+  router := buildRouter()
 
   http.Handle("/", &Server{ router })
 

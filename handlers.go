@@ -1,14 +1,10 @@
-package handlers
+package main
 
 import (
   "net/http"
   "fmt"
   "encoding/json"
-
   "github.com/gorilla/mux"
-
-  "github.com/blwsk/ginger/utils"
-  "github.com/blwsk/ginger/data"
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -16,11 +12,18 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostsIndexHandler(w http.ResponseWriter, r *http.Request) {
-  res1 := data.Post{"Tour de France 2016", utils.RandId(100000)}
-  res2 := data.Post{"Paris Roubaix 2016", utils.RandId(100000)}
+  res1 := Post{
+    "Tour de France 2016",
+    randId(100000),
+  }
 
-  m := data.Posts{
-    []data.Post{
+  res2 := Post{
+    "Paris Roubaix 2016",
+    randId(100000),
+  }
+
+  m := Posts{
+    []Post{
       res1,
       res2,
     },
