@@ -35,6 +35,7 @@ func buildRouter() *mux.Router {
   router.HandleFunc("/", IndexHandler).Methods("GET")
   router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
   router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
+  router.HandleFunc("/vars", VarHandler).Methods("GET")
 
   return router
 }
