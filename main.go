@@ -15,7 +15,8 @@ func (server *Server) ServeHTTP(resWriter http.ResponseWriter, req *http.Request
   origin := req.Header.Get("Origin")
 
   if origin != "" {
-    resWriter.Header().Set("Access-Control-Allow-Origin", origin)
+    resWriter.Header().Set("Access-Control-Allow-Origin",
+      origin)
     resWriter.Header().Set("Access-Control-Allow-Methods",
       "POST, GET, OPTIONS, PUT, DELETE")
     resWriter.Header().Set("Access-Control-Allow-Headers",
@@ -35,7 +36,9 @@ func buildRouter() *mux.Router {
   router.HandleFunc("/", IndexHandler).Methods("GET")
   router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
   router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
-  router.HandleFunc("/vars", VarHandler).Methods("GET")
+  // router.HandleFunc("/vars", VarHandler).Methods("GET")
+  router.HandleFunc("/auth", AuthHandler).Methods("GET")
+  router.HandleFunc("/protected", Authenticated(ProtectedHandler)).Methods("GET")
 
   return router
 }
