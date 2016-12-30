@@ -1,16 +1,15 @@
 package main
 
 import (
-  // "os"
-  "net/http"
   "fmt"
-  // "strings"
   "time"
+  "net/http"
   "encoding/json"
+
   "github.com/gorilla/mux"
 )
 
-const cookieName string = "_krb_cookiee"
+const authCookieName string = "_krb_cookie"
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintln(w, "Index")
@@ -47,33 +46,16 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintln(w, "id:", postId)
 }
 
-// func VarHandler(w http.ResponseWriter, r *http.Request) {
-//   vars := os.Environ()
-
-//   v := make([]Var, len(vars))
-
-//   for i, e := range vars {
-//     c := strings.Split(e, "=")
-
-//     v[i] = Var{
-//       c[0],
-//       c[1],
-//     }
-//   }
-
-//   x := Vars{
-//     v,
-//   }
-
-//   blob, _ := json.Marshal(x)
-
-//   fmt.Fprintln(w, string(blob))
-// }
-
 func AuthHandler(w http.ResponseWriter, r *http.Request) {
+  token, err := CreateAuthToken("test@test.com")
+
+  if err != nil {
+    UnauthenticatedHandler(w, r)
+  }
+
   c := http.Cookie{
-    Name: cookieName,
-    Value: "hello",
+    Name: authCookieName,
+    Value: token,
     Expires: time.Now().Add(time.Hour),
     HttpOnly: false,
     MaxAge: 50000,
@@ -89,11 +71,26 @@ func UnauthenticatedHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintln(w, "failure")
 }
 
-func Authenticated(f http.HandlerFunc) http.HandlerFunc {
+func isValidCookie(c *http.Cookie) bool {
+  if c.Name != authCookieName {
+    return false
+  }
+
+  v := HasValidAuthToken(c.Value)
+
+  fmt.Println(v)
+
+  return v
+}
+
+func IsAuthenticated(f http.HandlerFunc) http.HandlerFunc {
   return func(w http.ResponseWriter, r *http.Request) {
-    if _, err := r.Cookie(cookieName); err == nil {
+    c, err := r.Cookie(authCookieName)
+
+    if err == nil && c != nil && isValidCookie(c) {
       f(w, r)
     } else {
+      // cookie not present or invalid
       UnauthenticatedHandler(w, r)
     }
   }

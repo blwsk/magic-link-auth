@@ -36,22 +36,13 @@ func buildRouter() *mux.Router {
   router.HandleFunc("/", IndexHandler).Methods("GET")
   router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
   router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
-  // router.HandleFunc("/vars", VarHandler).Methods("GET")
   router.HandleFunc("/auth", AuthHandler).Methods("GET")
-  router.HandleFunc("/protected", Authenticated(ProtectedHandler)).Methods("GET")
+  router.HandleFunc("/protected", IsAuthenticated(ProtectedHandler)).Methods("GET")
 
   return router
 }
 
 func main() {
-  // db, err := db.ConnectToDb()
-
-  // defer db.Close()
-
-  // if err != nil {
-  //   log.Fatal(err);
-  // }
-
   router := buildRouter()
 
   http.Handle("/", &Server{ router })
