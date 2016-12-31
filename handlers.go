@@ -47,10 +47,19 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuthHandler(w http.ResponseWriter, r *http.Request) {
+  vars := mux.Vars(r)
+  hash := vars["hash"]
+
+  if IsValidHash(hash) == false {
+    fmt.Fprintln(w, "failed to set cookie, must fix")
+    return
+  }
+
   token, err := CreateAuthToken("test@test.com")
 
   if err != nil {
-    UnauthenticatedHandler(w, r)
+    fmt.Fprintln(w, "failed to set cookie, must fix")
+    return
   }
 
   c := http.Cookie{
@@ -64,11 +73,25 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 
   http.SetCookie(w, &c)
 
-  fmt.Fprintln(w, true)
+  fmt.Fprintln(w, "cookie set")
 }
 
 func UnauthenticatedHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintln(w, "failure")
+  rec := "k@blwsk.com"
+  err := SendAuthEmail(rec)
+
+  blob := Action{
+    Type: "SENT_AUTH_EMAIL",
+    Payload: rec,
+  }
+
+  m, err := json.Marshal(blob)
+
+  if err != nil {
+    fmt.Fprintln(w, "Try auth-ing again, maybe?")
+  }
+
+  fmt.Fprintln(w, string(m))
 }
 
 func isValidCookie(c *http.Cookie) bool {

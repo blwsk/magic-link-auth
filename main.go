@@ -36,7 +36,7 @@ func buildRouter() *mux.Router {
   router.HandleFunc("/", IndexHandler).Methods("GET")
   router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
   router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
-  router.HandleFunc("/auth", AuthHandler).Methods("GET")
+  router.HandleFunc("/auth/{hash}", AuthHandler).Methods("GET")
   router.HandleFunc("/protected", IsAuthenticated(ProtectedHandler)).Methods("GET")
 
   return router

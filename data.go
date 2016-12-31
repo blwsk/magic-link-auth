@@ -8,3 +8,8 @@ type Post struct {
 type Posts struct {
   PostArray []Post  `json:"posts"`
 }
+
+type Action struct {
+  Type    string `json:"type"`
+  Payload string `json:"payload"`
+}
