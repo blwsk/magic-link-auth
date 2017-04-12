@@ -1,15 +1,22 @@
 package main
 
 import (
+  "fmt"
   "log"
   "net/http"
   "github.com/gorilla/mux"
-  // "github.com/blwsk/ginger/db"
+  "database/sql"
+
+  "github.com/blwsk/ginger/data"
 )
 
 type Server struct {
   router    *mux.Router
 }
+
+var (
+  DbConn *sql.DB
+)
 
 func (server *Server) ServeHTTP(resWriter http.ResponseWriter, req *http.Request) {
   origin := req.Header.Get("Origin")
@@ -33,16 +40,29 @@ func (server *Server) ServeHTTP(resWriter http.ResponseWriter, req *http.Request
 func buildRouter() *mux.Router {
   router := mux.NewRouter().StrictSlash(true)
 
-  router.HandleFunc("/", IndexHandler).Methods("GET")
-  router.HandleFunc("/posts", PostsIndexHandler).Methods("GET")
-  router.HandleFunc("/posts/{id}", PostHandler).Methods("GET")
   router.HandleFunc("/auth/{hash}", AuthHandler).Methods("GET")
   router.HandleFunc("/protected", IsAuthenticated(ProtectedHandler)).Methods("GET")
+  router.HandleFunc("/magic-link", MagicLinkHandler).Methods("POST")
 
   return router
 }
 
 func main() {
+  var err error
+  DbConn, err = data.ConnectToDb()
+
+  if err != nil {
+    fmt.Print(err)
+    log.Fatal(err)
+  }
+
+  err = DbConn.Ping()
+
+  if err != nil {
+    fmt.Print(err)
+    log.Fatal(err)
+  }
+
   router := buildRouter()
 
   http.Handle("/", &Server{ router })
