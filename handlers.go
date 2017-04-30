@@ -39,7 +39,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
     HttpOnly: false,
     MaxAge: 50000,
     Path: "/",
-    Domain: ".blwsk.com",
+    Domain: ".now.sh",
   }
 
   http.SetCookie(w, &c)
