@@ -1,5 +1,10 @@
 ginger
+main
 
 tmp
 
 dev.sh
+now.sh
+
+bin/dev.sh
+bin/now.sh
