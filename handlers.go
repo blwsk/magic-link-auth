@@ -5,13 +5,13 @@ import (
   // "log"
   "time"
   "net/http"
-  "encoding/json"
+  // "encoding/json"
   // "database/sql"
   _ "github.com/lib/pq"
   "github.com/gorilla/mux"
 
   "github.com/blwsk/ginger/auth"
-  "github.com/blwsk/ginger/data"
+  // "github.com/blwsk/ginger/data"
 )
 
 const authCookieName string = "_krb_cookie"
@@ -20,12 +20,14 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
   hash := vars["hash"]
 
-  if auth.IsValidHash(hash) == false {
-    fmt.Fprintln(w, "failed to set cookie, must fix")
+  email, err := getEmailFromHash(hash)
+
+  if err != nil || email == "" {
+    fmt.Fprintln(w, "Invalid hash")
     return
   }
 
-  token, err := auth.CreateAuthToken("test@test.com")
+  token, err := auth.CreateAuthToken(email)
 
   if err != nil {
     fmt.Fprintln(w, "failed to create auth token")
@@ -48,21 +50,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UnauthenticatedHandler(w http.ResponseWriter, r *http.Request) {
-  rec := "k@blwsk.com"
-  err := auth.SendAuthEmail(rec)
-
-  blob := data.Action{
-    Type: "SENT_AUTH_EMAIL",
-    Payload: rec,
-  }
-
-  m, err := json.Marshal(blob)
-
-  if err != nil {
-    fmt.Fprintln(w, "Try auth-ing again, maybe?")
-  }
-
-  fmt.Fprintln(w, string(m))
+  http.Redirect(w, r, "https://kbielawski.com/login", 300)
 }
 
 func isValidCookie(c *http.Cookie) bool {
@@ -75,6 +63,23 @@ func isValidCookie(c *http.Cookie) bool {
   fmt.Println(v)
 
   return v
+}
+
+func getEmailFromHash(hash string) (string, error) {
+  rows, err := DbConn.Query(
+    `SELECT email FROM magic_string WHERE magic_string = $1 LIMIT 1;`, hash)
+
+  var email string
+
+  for rows.Next() {
+    err = rows.Scan(&email)
+  }
+
+  if err != nil {
+    return "Error", err
+  } else {
+    return email, err
+  }
 }
 
 func IsAuthenticated(f http.HandlerFunc) http.HandlerFunc {
@@ -94,23 +99,16 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintln(w, "success")
 }
 
-func SaveMagicString(email string, hash string) (string, error) {
-  // save in postgres
-
+func SaveMagicString(email string, hash string) error {
   stmt, err := DbConn.Prepare(
     `INSERT INTO "magic_string" (magic_string, expires_at, email) VALUES ($1, $2, $3);`)
 
-  _, err = stmt.Exec(hash, time.Now().Add(time.Minute * 15), email)
+  _, err = stmt.Exec(
+    hash,
+    time.Now().Add(time.Minute * 15),
+    email)
 
-  if err != nil {
-    return "Problem", err
-  }
-
-  return "Success", err
-}
-
-func SendMagicStringEmail(email string, hash string) error {
-  return nil
+  return err
 }
 
 func MagicLinkHandler(w http.ResponseWriter, r *http.Request) {
@@ -127,12 +125,19 @@ func MagicLinkHandler(w http.ResponseWriter, r *http.Request) {
 
   hash, err := auth.GenerateHashString()
 
-  blah, err := SaveMagicString(email, hash)
+  err = SaveMagicString(email, hash)
 
   if err != nil {
     fmt.Fprintln(w, err)
     return
   }
 
-  fmt.Fprintln(w, blah)
+  err = auth.SendAuthEmail(email, hash)
+
+  if err != nil {
+    fmt.Fprintln(w, err)
+    return
+  }
+
+  fmt.Fprintln(w, "Success")
 }

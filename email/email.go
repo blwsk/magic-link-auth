@@ -5,7 +5,7 @@ package email
 
 import (
   "os"
-  "strings"
+  // "strings"
   "net/smtp"
 )
 
@@ -25,14 +25,16 @@ func NewSender(Username, Password string) Sender {
   }
 }
 
-func (sender Sender) SendMail(recipients []string, Subject, bodyMessage string) error {
-  msg := "From: " + sender.User + "\n" +
-    "To: " + strings.Join(recipients, ",") + "\n" +
-    "Subject: " + Subject + "\n" + bodyMessage
+func (sender Sender) SendMail(recipients []string, subject string, body string) error {
+  server := SMTP_SERVER + ":587"
+  auth := smtp.PlainAuth("", sender.User, sender.Password, SMTP_SERVER)
+  from := sender.User
 
-  return smtp.SendMail(SMTP_SERVER + ":587",
-    smtp.PlainAuth("", sender.User, sender.Password, SMTP_SERVER),
-    sender.User,
-    recipients,
-    []byte(msg))
+  mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n";
+
+  subjectStr := "Subject: " + subject + "\n"
+
+  msg := []byte(subjectStr + mime + body)
+
+  return smtp.SendMail(server, auth, from, recipients, msg)
 }

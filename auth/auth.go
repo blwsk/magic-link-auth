@@ -67,34 +67,31 @@ func GenerateHashString() (string, error) {
   return hash.String(), nil
 }
 
-func IsValidHash(h string) bool {
-  return h == "12345"
-}
-
-func SendAuthEmail(recipient string) error {
+func SendAuthEmail(recipient string, authHash string) error {
   pass := os.Getenv("EMAIL_PASS")
 
   if pass != "" {
-    return actuallySendAuthEmail(recipient)
+    return actuallySendAuthEmail(recipient, authHash)
   }
 
   return errors.New("Failed to send email")
 }
 
-func actuallySendAuthEmail(rec string) error {
+func actuallySendAuthEmail(recipient string, authHash string) error {
   sender := email.NewSender(os.Getenv("EMAIL_ADDRESS"), os.Getenv("EMAIL_PASS"))
 
-  recipients := []string{rec}
-
-  u, err := GenerateHash()
-
-  if err != nil {
-    return err
+  recipients := []string{
+    recipient,
   }
 
-  hash := u.String()
-  subject := hash
-  body := "try this: http://localhost:8080/auth/" + hash
+  subject := "Click on the magic link to login"
+  body := "<html><body>Click <a href=\"https://kbielawski.com/auth/" +
+    authHash + "\">here</a></body></html>"
 
-  return sender.SendMail(recipients, subject, body + hash)
+  err := sender.SendMail(
+    recipients,
+    subject,
+    body)
+
+  return err
 }
