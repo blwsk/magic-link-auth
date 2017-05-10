@@ -85,7 +85,7 @@ func actuallySendAuthEmail(recipient string, authHash string) error {
   }
 
   subject := "Click on the magic link to login"
-  body := "<html><body>Click <a href=\"https://kbielawski.com/auth/" +
+  body := "<html><body>Click <a href=\"https://kbielawski.com/auth?hash=" +
     authHash + "\">here</a></body></html>"
 
   err := sender.SendMail(
