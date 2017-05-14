@@ -23,6 +23,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
   email, err := getEmailFromHash(hash)
 
   if err != nil || email == "" {
+    w.WriteHeader(404)
     fmt.Fprintln(w, "Invalid hash")
     return
   }
