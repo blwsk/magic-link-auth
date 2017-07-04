@@ -1,6 +1,6 @@
 # magic-link-auth
 
-Authentication proof-of-concept: "magic link" is sent to one's inbox; GET request validates hash and drops JWT token.
+Authentication proof-of-concept. A "magic link" is sent to one's inbox and a GET request validates the hash and drops a JWT token.
 
 ### Develop: `dev.sh`
 ```
