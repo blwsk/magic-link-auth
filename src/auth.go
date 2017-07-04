@@ -1,4 +1,4 @@
-package auth
+package main
 
 import (
 	"errors"
@@ -7,8 +7,6 @@ import (
 	"github.com/nu7hatch/gouuid"
 	"os"
 	"time"
-
-	"github.com/blwsk/ginger/email"
 )
 
 type AuthClaims struct {
@@ -78,7 +76,7 @@ func SendAuthEmail(recipient string, authHash string) error {
 }
 
 func actuallySendAuthEmail(recipient string, authHash string) error {
-	sender := email.NewSender(os.Getenv("EMAIL_ADDRESS"), os.Getenv("EMAIL_PASS"))
+	sender := NewSender(os.Getenv("EMAIL_ADDRESS"), os.Getenv("EMAIL_PASS"))
 
 	recipients := []string{
 		recipient,

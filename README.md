@@ -1,0 +1,54 @@
+# magic-link-auth
+
+Authentication proof-of-concept: "magic link" is sent to one's inbox; GET request validates hash and drops JWT token.
+
+### Develop: `dev.sh`
+```
+#!/bin/sh
+
+SMTP_SERVER="..."
+EMAIL_ADDRESS="email@address.com"
+EMAIL_PASS="..."
+
+POSTGRES_HOST="..."
+POSTGRES_PORT="5432"
+POSTGRES_USER="..."
+POSTGRES_PASSWORD="..."
+POSTGRES_DBNAME="..."
+
+env \
+  SMTP_SERVER=$SMTP_SERVER \
+  EMAIL_ADDRESS=$EMAIL_ADDRESS \
+  EMAIL_PASS=$EMAIL_PASS \
+  POSTGRES_HOST=$POSTGRES_HOST \
+  POSTGRES_PORT=$POSTGRES_PORT \
+  POSTGRES_USER=$POSTGRES_USER \
+  POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+  POSTGRES_DBNAME=$POSTGRES_DBNAME \
+  fresh
+```
+
+### Deploy: `now.sh`
+```
+#!/bin/sh
+
+SMTP_SERVER="..."
+EMAIL_ADDRESS="email@address.com"
+EMAIL_PASS="..."
+
+POSTGRES_HOST="..."
+POSTGRES_PORT="5432"
+POSTGRES_USER="..."
+POSTGRES_PASSWORD="..."
+POSTGRES_DBNAME="..."
+
+now \
+  -e SMTP_SERVER=$SMTP_SERVER \
+  -e EMAIL_ADDRESS=$EMAIL_ADDRESS \
+  -e EMAIL_PASS=$EMAIL_PASS \
+  -e POSTGRES_HOST=$POSTGRES_HOST \
+  -e POSTGRES_PORT=$POSTGRES_PORT \
+  -e POSTGRES_USER=$POSTGRES_USER \
+  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+  -e POSTGRES_DBNAME=$POSTGRES_DBNAME
+```

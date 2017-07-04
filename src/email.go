@@ -1,12 +1,11 @@
-package email
+package main
 
 // NOTE:
 // https://github.com/tangingw/go_smtp/blob/master/send_mail.go
 
 import (
-	"os"
-	// "strings"
 	"net/smtp"
+	"os"
 )
 
 var (

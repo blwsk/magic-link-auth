@@ -6,8 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-
-	"github.com/blwsk/ginger/data"
 )
 
 type Server struct {
@@ -49,7 +47,7 @@ func buildRouter() *mux.Router {
 
 func main() {
 	var err error
-	DbConn, err = data.ConnectToDb()
+	DbConn, err = ConnectToDb()
 
 	if err != nil {
 		fmt.Print(err)

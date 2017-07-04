@@ -1,4 +1,4 @@
-package data
+package main
 
 type Action struct {
 	Type    string `json:"type"`

@@ -2,16 +2,10 @@ package main
 
 import (
 	"fmt"
-	// "log"
-	"net/http"
-	"time"
-	// "encoding/json"
-	// "database/sql"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-
-	"github.com/blwsk/ginger/auth"
-	// "github.com/blwsk/ginger/data"
+	"net/http"
+	"time"
 )
 
 const authCookieName string = "_krb_cookie"
@@ -28,7 +22,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.CreateAuthToken(email)
+	token, err := CreateAuthToken(email)
 
 	if err != nil {
 		fmt.Fprintln(w, "failed to create auth token")
@@ -59,7 +53,7 @@ func isValidCookie(c *http.Cookie) bool {
 		return false
 	}
 
-	v := auth.HasValidAuthToken(c.Value)
+	v := HasValidAuthToken(c.Value)
 
 	fmt.Println(v)
 
@@ -124,7 +118,7 @@ func MagicLinkHandler(w http.ResponseWriter, r *http.Request) {
 
 	email := emailVals[0]
 
-	hash, err := auth.GenerateHashString()
+	hash, err := GenerateHashString()
 
 	err = SaveMagicString(email, hash)
 
@@ -133,7 +127,7 @@ func MagicLinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = auth.SendAuthEmail(email, hash)
+	err = SendAuthEmail(email, hash)
 
 	if err != nil {
 		fmt.Fprintln(w, err)
