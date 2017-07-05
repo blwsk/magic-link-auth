@@ -12,8 +12,6 @@ Authentication proof-of-concept. A "magic link" is sent to one's inbox and a GET
 
 ### Develop
 ```
-// /bin/dev.sh
-
 #!/bin/sh
 
 SMTP_SERVER="..."
@@ -40,8 +38,6 @@ env \
 
 ### Deploy
 ```
-// /bin/now.sh
-
 #!/bin/sh
 
 SMTP_SERVER="..."
