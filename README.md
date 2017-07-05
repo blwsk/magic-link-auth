@@ -2,6 +2,14 @@
 
 Authentication proof-of-concept. A "magic link" is sent to one's inbox and a GET request validates the hash and drops a JWT token.
 
+### Status
+- [x] `POST` to `/magic-link?email=email@address.com` sends HTML email to `email@address.com` containing link to web app
+- [x] Web app authentication page makes `GET` request to `/auth/{hash}`, consulting database
+- [x] Cookie is dropped on client, storing authentication info
+- [ ] Invalidate used/expired hashes
+- [ ] Only store a single hash for each email address
+- [ ] Ensure email address exists in `user` table before generating and storing a hash
+
 ### Develop: `dev.sh`
 ```
 #!/bin/sh
