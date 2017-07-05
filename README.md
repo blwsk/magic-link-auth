@@ -10,8 +10,10 @@ Authentication proof-of-concept. A "magic link" is sent to one's inbox and a GET
 - [ ] Only store a single hash for each email address
 - [ ] Ensure email address exists in `user` table before generating and storing a hash
 
-### Develop: `dev.sh`
+### Develop
 ```
+// /bin/dev.sh
+
 #!/bin/sh
 
 SMTP_SERVER="..."
@@ -36,8 +38,10 @@ env \
   fresh
 ```
 
-### Deploy: `now.sh`
+### Deploy
 ```
+// /bin/now.sh
+
 #!/bin/sh
 
 SMTP_SERVER="..."
